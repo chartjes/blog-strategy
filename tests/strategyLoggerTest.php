@@ -14,47 +14,41 @@ class LoggerStrategyTest extends PHPUnit_Framework_TestCase
 	}
 	
 	/**
-	 * @test
+	 * Data provider for testing our logging object
 	 */
-	public function testNotice()
+	public function loggerTestingScenarios() 
 	{
-		$message = 'NOTICE::test notice message';
-		$expectedResponse = "Wrote test notice message to notice file";
-		$response = $this->logger->logMessage($message);
-		$this->assertEquals(
-			$expectedResponse,
-			$response,
-			'Did not get expected notice-level message'
+		return array(
+			array(
+				'NOTICE::test notice message',
+				'Wrote test notice message to notice file'
+			),
+			array(
+				'CRITICAL::test notice message',
+				'Sent email to Ops'
+			),
+			array(
+				'CATASTROPHE::test notice message',
+				'Sent text to CEO'
+			),
 		);
 	}
 
 	/**
 	 * @test
+	 * @dataProvider loggerTestingScenarios
+	 * @param $message          string
+	 * @param $expectedResponse string
 	 */
-	public function testCritical()
+	public function testReturnsExpectedResponseBasedOnMessage(
+		$message,
+		$expectedResponse)
 	{
-		$message = 'CRITICAL::test notice message';
-		$expectedResponse = "Sent email to Ops";
 		$response = $this->logger->logMessage($message);
 		$this->assertEquals(
 			$expectedResponse,
 			$response,
-			'Did not get expected critical-level message'
-		);
-	}
-
-	/**
-	 * @test
-	 */
-	public function testCatastrophe()
-	{
-		$message = 'CATASTROPHE::test catastrophe message';
-		$expectedResponse = "Sent text to CEO";
-		$response = $this->logger->logMessage($message);
-		$this->assertEquals(
-			$expectedResponse,
-			$response,
-			'Did not get expected catastrophe level message'
+			'Did not get expected response'
 		);
 	}
 
@@ -64,7 +58,6 @@ class LoggerStrategyTest extends PHPUnit_Framework_TestCase
 	public function testThrowsExceptionWhenUnknownLevelSubmitted()
 	{
 		$this->setExpectedException('LoggingException', 'Unknown logging level test');
-		$response = $this->logger->logMessage('TEST::test message');
+		$response = $this->logger->logMessage('TEST:: test message');
 	}
-
 }
